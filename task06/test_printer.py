@@ -48,6 +48,35 @@ def test_unary_operation():
 def test_function_call():
     assert pprint(FunctionCall(Reference('foo'),
                   [Number(1), Number(2), Number(3)])) == "foo(1, 2, 3);"
+                            
+
+def test_end_to_end():
+    program = FunctionDefinition('main', Function(['arg1'], [
+        Read('x'),
+        Print(Reference('x')),
+        Conditional(
+            BinaryOperation(Number(2), '==', Number(3)),
+            [
+                Conditional(Number(1), [], [])
+                ],
+            [
+                FunctionCall(Reference('exit'), [
+                    UnaryOperation('-', Reference('arg1'))
+                    ])
+                ],
+            ),
+        ]))
+    assert pprint(program) == \
+        'def main(arg1) {\n' + \
+        '    read x;\n' + \
+        '    print x;\n' + \
+        '    if ((2 == 3)) \n' + \
+        '        if (1) \n' + \
+        '        ;\n' + \
+        '     else \n' + \
+        '        exit(-arg1);\n' + \
+        '    ;\n' + \
+        '};'
 
 
 if __name__ == "__main__":

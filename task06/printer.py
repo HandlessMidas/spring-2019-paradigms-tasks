@@ -23,7 +23,7 @@ class PrettyPrinter(ASTNodeVisitor):
             if i != 0:
                 self.newline()
             stmt.accept(self)
-            self.result += ";"
+            self.out += ";"
         self.indent -= 1
         self.newline()
 
