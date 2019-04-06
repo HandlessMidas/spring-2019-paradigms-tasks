@@ -29,6 +29,48 @@ class ASTNode(metaclass=abc.ABCMeta):
         """
 
 
+class ASTNodeVisitor(metaclass=abc.ABCMeta):
+    @abc.abstractmethod
+    def visit_number(self, number):
+        pass
+
+    @abc.abstractmethod
+    def visit_function(self, function):
+        pass
+
+    @abc.abstractmethod
+    def visit_function_definition(self, function_definition):
+        pass
+
+    @abc.abstractmethod
+    def visit_conditional(self, conditional):
+        pass
+
+    @abc.abstractmethod
+    def visit_print(self, print_):
+        pass
+
+    @abc.abstractmethod
+    def visit_read(self, read):
+        pass
+
+    @abc.abstractmethod
+    def visit_function_call(self, function_call):
+        pass
+
+    @abc.abstractmethod
+    def visit_reference(self, reference):
+        pass
+
+    @abc.abstractmethod
+    def visit_binary_operation(self, binary_operation):
+        pass
+
+    @abc.abstractmethod
+    def visit_unary_operation(self, unary_operation):
+        pass
+
+
 class Number(ASTNode):
     """
     Представляет собой константу или значение типа "целое число".
