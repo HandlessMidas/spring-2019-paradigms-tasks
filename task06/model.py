@@ -99,6 +99,7 @@ class Number(ASTNode):
     def accept(self, visitor):
         return visitor.visit_number(self)
 
+
 class Function(ASTNode):
     """
     Представляет собой константу или значение типа "функция".

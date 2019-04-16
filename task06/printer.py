@@ -42,11 +42,13 @@ class PrettyPrinter(ASTNodeVisitor):
     def visit_conditional(self, conditional):
         self.out += 'if ('
         conditional.condition.accept(self)
-        self.out += ') '
+        self.out += ") {"
         self.visit_block(conditional.if_true)
+        self.out += "}"
         if conditional.if_false:
-            self.out += ' else '
+            self.out += " else {"
             self.visit_block(conditional.if_false)
+            self.out += '}'
 
     def visit_print(self, print_):
         self.out += "print "

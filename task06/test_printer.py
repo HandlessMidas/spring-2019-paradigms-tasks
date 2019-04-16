@@ -15,7 +15,7 @@ def pprint(program):
 def test_conditional(capsys):
     pretty_print(Conditional(Number(42), [], []))
     out = capsys.readouterr().out
-    assert out == "if (42) \n;\n"
+    assert out == "if (42) {\n}\n"
 
 
 def test_function_definition(capsys):
@@ -87,46 +87,19 @@ def test_end_to_end(capsys):
         ]))
     pretty_print(program)
     out = capsys.readouterr().out
+    print(out)
     assert out == '''\
 def main(arg1) {
     read x;
     print x;
-    if ((2 == 3))
-        if (1)
-        ;
-     else
+    if ((2 == 3)) {
+        if (1) {
+        }
+    } else {
         exit((-arg1));
-    ;
+    }
 }
 '''
-
-def test_end_to_end():
-    program = FunctionDefinition('main', Function(['arg1'], [
-        Read('x'),
-        Print(Reference('x')),
-        Conditional(
-            BinaryOperation(Number(2), '==', Number(3)),
-            [
-                Conditional(Number(1), [], [])
-                ],
-            [
-                FunctionCall(Reference('exit'), [
-                    UnaryOperation('-', Reference('arg1'))
-                    ])
-                ],
-            ),
-        ]))
-    assert pprint(program) == \
-        'def main(arg1) {\n' + \
-        '    read x;\n' + \
-        '    print x;\n' + \
-        '    if ((2 == 3)) \n' + \
-        '        if (1) \n' + \
-        '        ;\n' + \
-        '     else \n' + \
-        '        exit(-arg1);\n' + \
-        '    ;\n' + \
-        '};'
 
 
 if __name__ == "__main__":
