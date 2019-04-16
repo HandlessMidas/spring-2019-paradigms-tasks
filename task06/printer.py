@@ -6,9 +6,6 @@ class PrettyPrinter(ASTNodeVisitor):
         self.out = ''
         self.indent = 0
 
-    def __str__(self):
-        return self.out + ";"
-
     def newline(self):
         self.out += "\n"
         self.out += "    " * self.indent
@@ -23,7 +20,8 @@ class PrettyPrinter(ASTNodeVisitor):
             if i != 0:
                 self.newline()
             stmt.accept(self)
-            self.out += ";"
+            if not self.out.endswith("}"):
+                self.out += ";"
         self.indent -= 1
         self.newline()
 
@@ -77,11 +75,15 @@ class PrettyPrinter(ASTNodeVisitor):
         self.out += ")"
 
     def visit_unary_operation(self, unary_operation):
+        self.out += "("
         self.out += "{}".format(unary_operation.op)
         unary_operation.expr.accept(self)
+        self.out += ")"
 
 
 def pretty_print(program):
     printer = PrettyPrinter()
     program.accept(printer)
-    print(str(printer))
+    if not printer.out.endswith("}"):
+        printer.out += ";"
+    print(printer.out)

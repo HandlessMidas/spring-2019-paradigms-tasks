@@ -97,9 +97,7 @@ class Number(ASTNode):
         return self
 
     def accept(self, visitor):
-        visitor.visit_number(self)
-
-
+        return visitor.visit_number(self)
 
 class Function(ASTNode):
     """
@@ -118,7 +116,7 @@ class Function(ASTNode):
         return self
 
     def accept(self, visitor):
-        visitor.visit_function(self)
+        return visitor.visit_function(self)
 
 
 class FunctionDefinition(ASTNode):
@@ -138,7 +136,7 @@ class FunctionDefinition(ASTNode):
         return self.function
 
     def accept(self, visitor):
-        visitor.visit_function_definition(self)
+        return visitor.visit_function_definition(self)
 
 
 class Conditional(ASTNode):
@@ -170,7 +168,7 @@ class Conditional(ASTNode):
         return result
 
     def accept(self, visitor):
-        visitor.visit_conditional(self)
+        return visitor.visit_conditional(self)
 
 
 class Print(ASTNode):
@@ -193,7 +191,7 @@ class Print(ASTNode):
         return expr_result
 
     def accept(self, visitor):
-        visitor.visit_print(self)
+        return visitor.visit_print(self)
 
 
 class Read(ASTNode):
@@ -215,7 +213,7 @@ class Read(ASTNode):
         return number
 
     def accept(self, visitor):
-        visitor.visit_read(self)
+        return visitor.visit_read(self)
 
 
 class FunctionCall(ASTNode):
@@ -254,7 +252,7 @@ class FunctionCall(ASTNode):
         return result
 
     def accept(self, visitor):
-        visitor.visit_function_call(self)
+        return visitor.visit_function_call(self)
 
 
 class Reference(ASTNode):
@@ -270,7 +268,7 @@ class Reference(ASTNode):
         return scope[self.name]
 
     def accept(self, visitor):
-        visitor.visit_reference(self)
+        return visitor.visit_reference(self)
 
 
 class BinaryOperation(ASTNode):
@@ -320,7 +318,7 @@ class BinaryOperation(ASTNode):
         return Number(int(result))
 
     def accept(self, visitor):
-        visitor.visit_binary_operation(self)
+        return visitor.visit_binary_operation(self)
 
 
 class UnaryOperation(ASTNode):
@@ -350,4 +348,4 @@ class UnaryOperation(ASTNode):
         return Number(int(result))
 
     def accept(self, visitor):
-        visitor.visit_unary_operation(self)
+        return visitor.visit_unary_operation(self)
