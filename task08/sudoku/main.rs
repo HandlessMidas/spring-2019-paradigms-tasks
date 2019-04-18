@@ -13,7 +13,7 @@ use threadpool::ThreadPool;
 // Чтобы не писать `field::Cell:Empty`, можно "заимпортировать" нужные вещи из модуля.
 use field::Cell::*;
 use field::{parse_field, Field, N};
-use std::sync::mpsc::channel;
+use std::sync::mpsc::{channel, Sender};
 
 /// Эта функция выполняет один шаг перебора в поисках решения головоломки.
 /// Она перебирает значение какой-нибудь пустой клетки на поле всеми непротиворечивыми способами.
@@ -168,13 +168,7 @@ fn find_solution(f: &mut Field) -> Option<Field> {
     try_extend_field(f, |f_solved| f_solved.clone(), find_solution)
 }
 
-/// Перебирает все возможные решения головоломки, заданной параметром `f`, в несколько потоков.
-/// Если хотя бы одно решение `s` существует, возвращает `Some(s)`,
-/// в противном случае возвращает `None`.
-fn find_solution_parallel(mut f: Field) -> Option<Field> {
-    let n_workers = 8;
-    let pool = ThreadPool::new(n_workers);
-    let (tx, rx) = channel();
+fn spawn_tasks(f: &mut Field, pool: &ThreadPool, tx: Sender<Option<Field>>) {
     let next_step_cb = |f1: &mut Field| -> Option<Field> {
         let tx = tx.clone();
         let mut f1 = f1.clone();
@@ -187,8 +181,17 @@ fn find_solution_parallel(mut f: Field) -> Option<Field> {
         tx.send(Some(f1.clone())).unwrap_or(());
         f1.clone()
     };
-    let solving_result = try_extend_field(&mut f, solved_cb, next_step_cb);
-    std::mem::drop(tx);
+    let solving_result = try_extend_field(f, solved_cb, next_step_cb);
+}
+
+/// Перебирает все возможные решения головоломки, заданной параметром `f`, в несколько потоков.
+/// Если хотя бы одно решение `s` существует, возвращает `Some(s)`,
+/// в противном случае возвращает `None`.
+fn find_solution_parallel(mut f: Field) -> Option<Field> {
+    let n_workers = 8;
+    let pool = ThreadPool::new(n_workers);
+    let (tx, rx) = channel();
+    spawn_tasks(&mut f, &pool, tx);
     rx.into_iter().find_map(|x| x)   
 }
 
