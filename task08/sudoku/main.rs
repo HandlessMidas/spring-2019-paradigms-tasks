@@ -168,31 +168,37 @@ fn find_solution(f: &mut Field) -> Option<Field> {
     try_extend_field(f, |f_solved| f_solved.clone(), find_solution)
 }
 
-fn spawn_tasks(f: &mut Field, pool: &ThreadPool, tx: Sender<Option<Field>>) {
-    let next_step_cb = |f1: &mut Field| -> Option<Field> {
+fn spawn_tasks(f: &mut Field, pool: &ThreadPool, tx: Sender<Option<Field>>, depth: i32) {
+    if depth == 0 {
         let tx = tx.clone();
-        let mut f1 = f1.clone();
-        pool.execute(move ||  {
-            tx.send(find_solution(&mut f1)).unwrap_or(());
+        let mut f = f.clone();
+        pool.execute(move || {
+            tx.send(find_solution(&mut f)).unwrap_or(());
         });
-        None
-    };
-    let solved_cb = |f1: &mut Field| -> Field {
-        tx.send(Some(f1.clone())).unwrap_or(());
-        f1.clone()
-    };
-    let solving_result = try_extend_field(f, solved_cb, next_step_cb);
+    } else {
+        let next_step_cb = |f1: &mut Field| -> Option<Field> {
+            let tx = tx.clone();
+            spawn_tasks(f1, pool, tx, depth - 1);
+            None
+        };
+        let solved_cb = |f1: &mut Field| -> Field {
+            tx.send(Some(f1.clone())).unwrap_or(());
+            f1.clone()
+        };
+        let solving_result = try_extend_field(f, solved_cb, next_step_cb);
+    }
 }
 
 /// Перебирает все возможные решения головоломки, заданной параметром `f`, в несколько потоков.
 /// Если хотя бы одно решение `s` существует, возвращает `Some(s)`,
 /// в противном случае возвращает `None`.
 fn find_solution_parallel(mut f: Field) -> Option<Field> {
+    const SPAWN_DEPTH: i32 = 2;
     let n_workers = 8;
     let pool = ThreadPool::new(n_workers);
     let (tx, rx) = channel();
-    spawn_tasks(&mut f, &pool, tx);
-    rx.into_iter().find_map(|x| x)   
+    spawn_tasks(&mut f, &pool, tx, SPAWN_DEPTH);
+    rx.into_iter().find_map(|x| x)
 }
 
 /// Юнит-тест, проверяющий, что `find_solution()` находит лексикографически минимальное решение на пустом поле.
