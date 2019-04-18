@@ -175,8 +175,21 @@ fn find_solution_parallel(mut f: Field) -> Option<Field> {
     let n_workers = 8;
     let pool = ThreadPool::new(n_workers);
     let (tx, rx) = channel();
-    pool.execute(move || tx.send(find_solution(&mut f)).unwrap());
-    rx.recv().unwrap()
+    let next_step_cb = |f1: &mut Field| -> Option<Field> {
+        let tx = tx.clone();
+        let mut f1 = f1.clone();
+        pool.execute(move ||  {
+            tx.send(find_solution(&mut f1)).unwrap_or(());
+        });
+        None
+    };
+    let solved_cb = |f1: &mut Field| -> Field {
+        tx.send(Some(f1.clone())).unwrap_or(());
+        f1.clone()
+    };
+    let solving_result = try_extend_field(&mut f, solved_cb, next_step_cb);
+    std::mem::drop(tx);
+    rx.into_iter().find_map(|x| x)   
 }
 
 /// Юнит-тест, проверяющий, что `find_solution()` находит лексикографически минимальное решение на пустом поле.
