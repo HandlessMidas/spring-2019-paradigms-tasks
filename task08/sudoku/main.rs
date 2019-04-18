@@ -6,6 +6,9 @@
 
 // Намек компилятору, что мы также хотим использовать наш модуль из файла `field.rs`.
 mod field;
+extern crate threadpool;
+
+use threadpool::ThreadPool;
 
 // Чтобы не писать `field::Cell:Empty`, можно "заимпортировать" нужные вещи из модуля.
 use field::Cell::*;
@@ -169,8 +172,10 @@ fn find_solution(f: &mut Field) -> Option<Field> {
 /// Если хотя бы одно решение `s` существует, возвращает `Some(s)`,
 /// в противном случае возвращает `None`.
 fn find_solution_parallel(mut f: Field) -> Option<Field> {
+    let n_workers = 8;
+    let pool = ThreadPool::new(n_workers);
     let (tx, rx) = channel();
-    tx.send(find_solution(&mut f)).unwrap();
+    pool.execute(move || tx.send(find_solution(&mut f)).unwrap());
     rx.recv().unwrap()
 }
 
