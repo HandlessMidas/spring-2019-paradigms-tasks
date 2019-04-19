@@ -185,7 +185,7 @@ fn spawn_tasks(f: &mut Field, pool: &ThreadPool, tx: Sender<Option<Field>>, dept
             tx.send(Some(f1.clone())).unwrap_or(());
             f1.clone()
         };
-        let solving_result = try_extend_field(f, solved_cb, next_step_cb);
+        try_extend_field(f, solved_cb, next_step_cb);
     }
 }
 
