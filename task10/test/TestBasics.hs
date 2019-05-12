@@ -36,7 +36,7 @@ testsBasics = testGroup "Unit tests for Basics tasks"
         head' [1..] @?= 1
 
     , testCase "tail' works on infinite list" $
-        (head' . tail') [3..] @?= 3
+        (head' . tail') [3..] @?= 4
 
     , testCase "take' works on infinite list" $
         take' 3 [1..] @?= [1..3]
