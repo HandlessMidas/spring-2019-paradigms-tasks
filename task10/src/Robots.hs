@@ -77,7 +77,7 @@ isAlive r = getHealth r > 0
 -- вернуть второго робота, как будто ничего и не было
 fight :: Robot -> Robot -> Robot
 fight attacker defender | isAlive attacker = setHealth (getHealth defender - getAttack attacker) defender
-                        | otherwise = defender
+                        | otherwise        = defender
 
 -- Наконец, напишите функцию, которая бы моделировала три раунда схватки между
 -- двумя роботами и возвращала бы победителя. Схватка происходит следующим образом:
@@ -88,13 +88,16 @@ fight attacker defender | isAlive attacker = setHealth (getHealth defender - get
 -- Победитель определеяется как робот, у которого уровень здоровья строго больше, чем у сопереника
 -- Если же так вышло, что после трех раундов у обоих роботов одинаковый уровень жизни, то
 -- победителем считается тот, кто ударял первым(то есть атакующий робот)
+
+getWinner :: Robot -> Robot -> Robot
+getWinner robot1 robot2 | getHealth robot1 > getHealth robot2 = robot1
+                        | otherwise                           = robot2
+
 threeRoundFight :: Robot -> Robot -> Robot
 threeRoundFight attacker defender = let defender' = fight attacker defender
                                         attacker' = fight defender' attacker
                                         defender'' = fight attacker' defender'
-                                    in if getHealth defender'' > getHealth attacker'
-                                       then defender''
-                                       else attacker'
+                                    in getWinner defender'' attacker'
 
 -- Шаг 4.
 -- Создайте список из трех роботов(Абсолютно любых, но лучше живых, мы собираемся их побить)
