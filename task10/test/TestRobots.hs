@@ -17,12 +17,12 @@ testsRobots = let
     in testGroup "Unit tests for Robots task"
         [ testCase "Test for getName" $
             getName walter @?= "Walter"
+        , testCase "Test for getAttack" $
+            getAttack walter @?= 50 
+        , testCase "Test for getHealth" $
+            getHealth walter @?= 50 
         , testCase "Test for printRobot" $
             printRobot walter @?= "Walter, attack: 50, health: 50"
-        , testCase "Test for getAttack" $
-            getAttack r2d2 @?= 10 
-        , testCase "Test for getHealth" $
-            getHealth ultron @?= 1000 
         , testCase "Test for setName" $
             setName "walter" walter @?= robot "walter" 50 50
         , testCase "Test for setAttack" $
@@ -33,6 +33,8 @@ testsRobots = let
             damage ultron 10 @?= robot "Ultron" 500 990
         , testCase "Test isAlive" $
             isAlive r2d2 @?= True 
+        , testCase "Test isAlive" $
+            isAlive (robot "Gena" 10 0) @?= False
         , testCase "Test fight with death" $
             fight ultron jarvis @?= robot "Jarvis" 100 (250 - 500)
         , testCase "Test fight without death" $
